@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IteratorDemo
 {
@@ -12,7 +13,10 @@ namespace IteratorDemo
 
         private static IPainter FindCheapestPainter(double sqMeters, IEnumerable<IPainter> painters)
         {
-
+            return
+                painters
+                    .Where(painter => painter.IsAvailable)
+                    .WithMinimum(painter => painter.EstimateCompensation(sqMeters));
         }
 
 
