@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace IteratorDemo
@@ -19,15 +18,13 @@ namespace IteratorDemo
                     .WithMinimum(painter => painter.EstimateCompensation(sqMeters));
         }
 
+        private static IPainter FindFastedPainter(double sqMeters, IEnumerable<IPainter> painters)
+        {
+            return painters
+                .Where(painter => painter.IsAvailable)
+                .WithMinimum(painter => painter.EstimateTimeToPaint(sqMeters));
+        }
 
-    }
 
-
-    public interface IPainter
-    {
-        bool IsAvailable{get; }
-
-        TimeSpan EstimateTimeToPaint(double sqMeters);
-        double EstimateCompensation(double sqMeters);
     }
 }
