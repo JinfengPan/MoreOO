@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace IteratorDemo
@@ -10,19 +11,37 @@ namespace IteratorDemo
            
         }
 
-        private static IPainter FindCheapestPainter(double sqMeters, IEnumerable<IPainter> painters)
-        {
-            return
-                painters
-                    .Where(painter => painter.IsAvailable)
-                    .WithMinimum(painter => painter.EstimateCompensation(sqMeters));
-        }
+        private static IPainter FindCheapestPainter(double sqMeters, Painters painters) =>
+            painters.GetAvailable().GetCheapstOne(sqMeters);
 
-        private static IPainter FindFastedPainter(double sqMeters, IEnumerable<IPainter> painters)
+        private static IPainter FindFastedPainter(double sqMeters, Painters painters) =>
+            painters.GetAvailable().GetFastestOne(sqMeters);
+
+
+        private static IPainter WorkTogether(double sqMeters, IEnumerable<IPainter> painters)
         {
-            return painters
+            TimeSpan time =
+                TimeSpan.FromHours(
+                    1/
+                    painters
+                        .Where(painter => painter.IsAvailable)
+                        .Select(painter => 1/painter.EstimateTimeToPaint(sqMeters).TotalHours)
+                        .Sum());
+
+            double cost = painters
                 .Where(painter => painter.IsAvailable)
-                .WithMinimum(painter => painter.EstimateTimeToPaint(sqMeters));
+                .Select(painter =>
+                    painter.EstimateCompensation(sqMeters)/
+                    painter.EstimateTimeToPaint(sqMeters).TotalHours*
+                    time.TotalHours)
+                .Sum();
+
+            return new ProportionalPainter()
+            {
+                TimePerSqMeter = TimeSpan.FromHours(time.TotalHours/sqMeters),
+                DollarsPerHour = cost/time.TotalHours
+            };
+
         }
 
 
